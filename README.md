@@ -1,6 +1,6 @@
 # Predicting-Distraction
 
-This is a part of my graduate research at the University of Tennessee-Knoxville that processing driving data from multiple files, combines and writes it to a new .npy file, and then that data is classified and analyzed by the relevant .py files. 
+This is a part of my graduate research at the University of Tennessee-Knoxville that processes driving data from multiple .xdf files, combines them, and writes it to a new .npy file. This data is then classified and analyzed with the relevant .py files. 
 
 # Data
 
