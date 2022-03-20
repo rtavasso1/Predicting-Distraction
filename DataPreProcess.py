@@ -5,40 +5,34 @@ import seaborn as sns
 import pandas as pd
 import copy
 import glob
-from sktime.datatypes._panel._convert import from_nested_to_3d_numpy
-import tensorflow as tf
+#from sktime.datatypes._panel._convert import from_nested_to_3d_numpy
 import os
 import neurokit2 as nk
 from scipy import signal
-#Cite Pytorch Tabular in publication
-# from pytorch_tabular import TabularModel
-# from pytorch_tabular.models import CategoryEmbeddingModelConfig
-# from pytorch_tabular.config import DataConfig, OptimizerConfig, TrainerConfig, ExperimentConfig
-
 
 def quantify(my_list):
     x = copy.deepcopy(my_list)
     for i in range(len(x)):
         if x[i] == ['BoundingBox', 'LeftGazePlane']:
-            x[i] = 1.0
+            x[i] = 2.0
         elif x[i] == ['BoundingBox', 'FrontGazePlane']:
             x[i] = 2.0
         elif x[i] == ['BoundingBox', 'RightGazePlane']:
-            x[i] = 3.0
+            x[i] = 2.0
         elif x[i] == ['BoundingBox', 'Arrows']:
             x[i] = 4.0
         elif x[i] == ['BoundingBox']:
             x[i] = 5.0
-        elif x[i] == ['BoundingBox', 'FrontGazePlane', 'LeftGazePlane']:
-            x[i] = 6.0
-        elif x[i] == ['BoundingBox', 'LeftGazePlane', 'FrontGazePlane']:
-            x[i] = 6.0
-        elif x[i] == ['BoundingBox', 'FrontGazePlane', 'RightGazePlane']:
-            x[i] = 7.0
-        elif x[i] == ['BoundingBox', 'RightGazePlane', 'FrontGazePlane']:
-            x[i] = 7.0
+        # elif x[i] == ['BoundingBox', 'FrontGazePlane', 'LeftGazePlane']:
+        #     x[i] = 6.0
+        # elif x[i] == ['BoundingBox', 'LeftGazePlane', 'FrontGazePlane']:
+        #     x[i] = 6.0
+        # elif x[i] == ['BoundingBox', 'FrontGazePlane', 'RightGazePlane']:
+        #     x[i] = 7.0
+        # elif x[i] == ['BoundingBox', 'RightGazePlane', 'FrontGazePlane']:
+        #     x[i] = 7.0
         else:
-            x[i] = 9999.0
+            x[i] = 1000.0
     return x
 
 def CountFrequency(my_list):
@@ -76,13 +70,13 @@ def sublister(x):
     return temp
 
 
-filepath = r"D:\\Users\\admin\\Documents\\BitBrain\\LabStreamLayer\\XDF_Files\\Experiment1\\"
+filepath = r"C:\Users\Riley\Desktop\UTK\DataVis\Experiment1\\"
 file_list = glob.glob(filepath + 'exp*.xdf')
 #Combined = pd.DataFrame()
 #Combined = np.empty([13,869,1])
 #Combined = np
 length = []
-maxlen = 475 #update when adding new files by taking max(length)
+maxlen = 353 #update when adding new files by taking max(length)
 for i, file in enumerate(file_list):
     data, header = pyxdf.load_xdf(file)
     for stream in data:
@@ -113,14 +107,16 @@ for i, file in enumerate(file_list):
             #print('BVP initialized')
             
         if stream['info']['name'] == ['BBT-BIO-AAB014_GEN_14']:
-            gsr_signal = y[:,0].tolist()
-            time = stream['time_stamps']
-            time1 = time[1]
-            timelast = time[-1]
-            tot_time = timelast - time1
-            sampling_rate = len(time)/tot_time
-            gsr_sig, info = nk.eda_process(gsr_signal, sampling_rate = sampling_rate)
-            gsr_phasic = gsr_sig.iloc[:,2]
+            gsr_phasic = y[:,0]
+            gsr_phasic = pd.cut(gsr_phasic,bins=10,labels=list(range(10))).tolist()
+            gsr_phasic = normalize(gsr_phasic)
+            # time = stream['time_stamps']
+            # time1 = time[1]
+            # timelast = time[-1]
+            # tot_time = timelast - time1
+            # sampling_rate = len(time)/tot_time
+            # gsr_sig, info = nk.eda_process(gsr_signal, sampling_rate = sampling_rate)
+            # gsr_phasic = gsr_sig.iloc[:,2]
             #gsr_phasic = [5.0 for i in range(len(y))]
             #print('GSR initialized')
             
@@ -141,10 +137,6 @@ for i, file in enumerate(file_list):
             Speed = y[:,0].tolist()
             #Speed = [5.0 for i in range(len(y))]
             #print('Speed initialized')
-        
-        if stream['info']['name'] == ['UE4 Lane']:
-            Lane = y
-            LaneL = [y[i][0] for i in range(len(Lane))]        
     
         if stream['info']['name'] == ['UE4 Pupil']:
             Pupil = y
@@ -175,28 +167,6 @@ for i, file in enumerate(file_list):
             Road = y
             Road = [True if i == ['BP_Traffic_path_91'] else False for i in Road]
             
-            
-        if stream['info']['name'] == ['Teleport 1']:
-            Teleport1 = y
-            for idx, i in enumerate(Teleport1):
-                if i == 9999:
-                    TP1 = idx
-                    break
-                
-        if stream['info']['name'] == ['Teleport 3']:
-            Teleport2 = y
-            for idx, i in enumerate(Teleport2):
-                if i == 9999:
-                    TP2 = idx
-                    break
-                
-        if stream['info']['name'] == ['Teleport 4']:
-            Teleport3 = y
-            for idx, i in enumerate(Teleport3):
-                if i == 9999:
-                    TP3 = idx
-                    break
-        
         if stream['info']['name'] == ['ArrowSequence']:
             Arrow = y[:,0].tolist()
             IDX44 = []
@@ -210,9 +180,9 @@ for i, file in enumerate(file_list):
                 if val == 9998 and Arrow[idx+1] == 0:
                     IDX00.append(idx)
     try:
-        dis1 = IDX00[0]
+        dis1 = IDX00[0] #handles the exception for when I do not mark the end of undistracted driving by accident
     except:
-        pass          
+        pass
     dis2begin = IDX44[0]
     dis2 = IDX44[-1] #end of 4x4
     dis3begin = IDX55[0]
@@ -222,70 +192,30 @@ for i, file in enumerate(file_list):
     length.append(dis3-dis3begin)
     
     gsr_phasic = signal.resample(gsr_phasic, len(Accel)).tolist()
-    gsr_phasic = normalize(gsr_phasic)
     
     x0 = np.linspace(1,dis1,dis1)
     x1 = np.linspace(1,dis2-dis2begin,dis2-dis2begin)
     x2 = np.linspace(1,dis3-dis3begin,dis3-dis3begin)
     xvals = np.linspace(1,maxlen, maxlen)
     
-    
     mylist0 = [Accel[:dis1],Brake[:dis1],Openness[:dis1],PupilL[:dis1],PupilR[:dis1],Speed[:dis1],Steering[:dis1],Throttle[:dis1],Center[:dis1],Front[:dis1],Back[:dis1],Objects_numeric[:dis1],gsr_phasic[:dis1]]#,Arrow[:dis1]]
-    #mylist0 = [np.interp(xvals, x0, goose) for goose in mylist0]
-    mylist0 = [goose + [9999.0] * (maxlen - len(goose)) for goose in mylist0]
+    #mylist0 = [np.interp(xvals, x0, sublist) for sublist in mylist0]
+    mylist0 = [sublist + [9999.0] * (maxlen - len(sublist)) for sublist in mylist0]
     mylist1 = [Accel[dis2begin:dis2],Brake[dis2begin:dis2],Openness[dis2begin:dis2],PupilL[dis2begin:dis2],PupilR[dis2begin:dis2],Speed[dis2begin:dis2],Steering[dis2begin:dis2],Throttle[dis2begin:dis2],Center[dis2begin:dis2],Front[dis2begin:dis2],Back[dis2begin:dis2],Objects_numeric[dis2begin:dis2],gsr_phasic[dis2begin:dis2]]#,Arrow[dis1:dis2]]
-    #mylist1 = [np.interp(xvals, x1, goose) for goose in mylist1]
-    mylist1 = [goose + [9999.0] * (maxlen - len(goose)) for goose in mylist1]
+    #mylist1 = [np.interp(xvals, x1, sublist) for sublist in mylist1]
+    mylist1 = [sublist + [9999.0] * (maxlen - len(sublist)) for sublist in mylist1]
     mylist2 = [Accel[dis3begin:dis3],Brake[dis3begin:dis3],Openness[dis3begin:dis3],PupilL[dis3begin:dis3],PupilR[dis3begin:dis3],Speed[dis3begin:dis3],Steering[dis3begin:dis3],Throttle[dis3begin:dis3],Center[dis3begin:dis3],Front[dis3begin:dis3],Back[dis3begin:dis3],Objects_numeric[dis3begin:dis3],gsr_phasic[dis3begin:dis3]]#,Arrow[dis2:]]
-    #mylist2 = [np.interp(xvals, x2, goose) for goose in mylist2]
-    mylist2 = [goose + [9999.0] * (maxlen - len(goose)) for goose in mylist2]
+    #mylist2 = [np.interp(xvals, x2, sublist) for sublist in mylist2]
+    mylist2 = [sublist + [9999.0] * (maxlen - len(sublist)) for sublist in mylist2]
     #Interpolation cannot be used because it causes you to lose time synchronicity across samples
-    
     
     mylist0 = np.reshape(mylist0, (1,13,maxlen))
     mylist1 = np.reshape(mylist1, (1,13,maxlen))
     mylist2 = np.reshape(mylist2, (1,13,maxlen))
-    conglom = np.concatenate((mylist0,mylist1,mylist2),axis=0)
     try:
-        #Combined = np.concatenate((Combined,mylist0,mylist1,mylist2),axis=0)
-        Combined = np.concatenate((Combined,conglom),axis=0)
+        Combined = np.concatenate((Combined,mylist0,mylist1,mylist2),axis=0)
     except:
         Combined = np.concatenate((mylist0,mylist1,mylist2),axis=0)
 
-
 os.remove('data.npy')
 np.save('data.npy', Combined, allow_pickle=True)
-
-# index = np.arange(len(Front))
-# # index = np.arange(HomeIDX[0])
-# # index = np.arange(HomeIDX[0],HomeIDX[1])
-# # index = np.arange(HomeIDX[1],TP1)
-# # index = np.arange(TP1,TP2)
-# # index = np.arange(TP2,TP3)
-# # index = np.arange(TP3,len(Front))
-# plt.plot(Front[index])
-# plt.plot(-Back[index])
-# plt.plot(Home[index])
-# plt.ylim(-50,50)
-# plt.title('Distance to cars')
-# plt.show()
-# plt.plot(Center[index])  
-# plt.title('Distance to Center')
-# plt.ylim(-300,300)
-# plt.show()  
-# plt.plot(Speed[index])
-# plt.title('Speed')
-# plt.show()
-# plt.plot(Accel[index])
-# plt.title('Accel')
-# plt.show()
-# plt.plot(Throttle[index])
-# plt.plot(Brake[index])
-# plt.title('Throttle and Brake')
-# plt.show()
-# plt.plot(Steering[index])
-# plt.title('Steering')
-# plt.show()
-# plt.plot(Openness[index])
-# plt.title('Eye Openness')
-# plt.show()
