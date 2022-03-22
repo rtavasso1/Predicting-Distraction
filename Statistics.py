@@ -69,12 +69,13 @@ X2 = pd.DataFrame(X2_2d, columns=columns)
 X3 = pd.DataFrame(X3_2d, columns=columns)
 X2 = X2[X2<9000] #filters missing data (values>9000)
 X3 = X3[X3<9000]
-X3.State = X3.State.map({0:'Undistracted',1:'Distracted',2:'Very Distracted'}) # replace numeric state with categorical
 
 corr2 = X2.corr().abs().unstack().reset_index()
 corr2 = corr2[corr2.level_0=='State']
 corr3 = X3.corr().abs().unstack().reset_index()
 corr3 = corr3[corr3.level_0=='State']
+
+X3.State = X3.State.map({0:'Undistracted',1:'Distracted',2:'Very Distracted'}) # replace numeric state with categorical
 
 if len(sys.argv) > 1:
     if sys.argv[1] == 'graphs':

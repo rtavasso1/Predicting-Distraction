@@ -70,13 +70,13 @@ def sublister(x):
     return temp
 
 
-filepath = r"C:\Users\Riley\Desktop\UTK\DataVis\Experiment1\\"
+filepath = r"D:\Users\admin\Documents\BitBrain\LabStreamLayer\Functions\Predicting-Distraction\Experiment1\\"
 file_list = glob.glob(filepath + 'exp*.xdf')
 #Combined = pd.DataFrame()
 #Combined = np.empty([13,869,1])
 #Combined = np
 length = []
-maxlen = 353 #update when adding new files by taking max(length)
+maxlen = 475 #update when adding new files by taking max(length)
 for i, file in enumerate(file_list):
     data, header = pyxdf.load_xdf(file)
     for stream in data:
