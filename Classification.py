@@ -14,6 +14,7 @@ import matplotlib.pyplot as plt
 
 
 X = np.load('data.npy', allow_pickle=True)
+X[:,0,:] = 5.0
 numSamples = X.shape[0]
 y2, y3 = [0,1,1]*(numSamples//3), [0,1,2]*(numSamples//3)
 y2, y3 = np.array(y2), np.array(y3)

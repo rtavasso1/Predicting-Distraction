@@ -24,7 +24,7 @@ def graphGen(): #function that generates plots
     Accel = sns.displot(x='Accel', hue='State', data=X3, kind='kde')
 
     #Speed
-    Speed = sns.displot(x='Speed', hue='State', data=X3,hist=True)
+    Speed = sns.displot(x='Speed', hue='State', data=X3, kind='kde')
 
     #Openness
     Openness = sns.displot(x='Openness', hue='State', data=X3, kind='ecdf')
@@ -45,7 +45,7 @@ def graphGen(): #function that generates plots
     PupilL = sns.displot(x='PupilL', hue='State', data=X3, kind='kde')
     
     #Versus
-    Versus = sns.displot(x='Front', y='Speed', data=X3)
+    Versus = sns.displot(x='Front', y='Speed', hue='State', data=X3)
 
 
 X = np.load('data.npy', allow_pickle=True).T
