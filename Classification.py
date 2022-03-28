@@ -18,7 +18,7 @@ def pairwise(array):
     length = array.shape[1]
     
 
-def trainScore(X,y2,y3,col='all'):
+def trainScore(X,y2,y3,col='all',graphs=True):
     confusion2, confusion3 = 0,0
     for n_iters in range(1):  #transforms data n different times
         X2 = transformer.fit_transform(X,y2)
@@ -47,12 +47,14 @@ def trainScore(X,y2,y3,col='all'):
     else:
         print(f"2 Class Accuracy with only {col}: {np.average(scores2):.2f}")
         print(f"3 Class Accuracy with only {col}: {np.average(scores3):.2f}")
-    disp2 = ConfusionMatrixDisplay(confusion_matrix=confusion2,display_labels=['Undistracted','Distracted'])
-    disp3 = ConfusionMatrixDisplay(confusion_matrix=confusion3,display_labels=['Undistracted','Distracted','Very Distracted'])
-    disp2.plot()
-    plt.show()
-    disp3.plot()
-    plt.show()
+        
+    if graphs==True:
+        disp2 = ConfusionMatrixDisplay(confusion_matrix=confusion2,display_labels=['Undistracted','Distracted'])
+        disp3 = ConfusionMatrixDisplay(confusion_matrix=confusion3,display_labels=['Undistracted','Distracted','Very Distracted'])
+        disp2.plot()
+        plt.show()
+        disp3.plot()
+        plt.show()
 
 
 X = np.load('data.npy', allow_pickle=True)
@@ -65,12 +67,12 @@ transformer = WEASELMUSE(word_size=5, n_bins=2, window_sizes=[12, 36],
                           chi2_threshold=15, sparse=False, strategy='uniform')
 
 
-trainScore(X,y2,y3)
+trainScore(X,y2,y3,graphs=False)
 
 # Accuracy by Column
-columns = ["Accel","Brake","Openness","PupilL","PupilR","Speed","Steering","Throttle","Center","Front","Back","Objects_numeric","gsr_phasic","State"]       
-for col1,col2 in more_itertools.pairwise(X):
-    print(col1.shape,col2.shape)
+# columns = ["Accel","Brake","Openness","PupilL","PupilR","Speed","Steering","Throttle","Center","Front","Back","Objects_numeric","gsr_phasic","State"]       
+# for col1,col2 in more_itertools.pairwise(X):
+#     print(col1.shape,col2.shape)
 # for col in range(12):
 #     #X_col = X[:,col:col+2,:].reshape(X.shape[0],2,X.shape[2])
 #     X_col = np.delete(X,[col,col+1],1)

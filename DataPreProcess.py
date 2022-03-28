@@ -70,7 +70,7 @@ def sublister(x):
     return temp
 
 
-filepath = r"D:\Users\admin\Documents\BitBrain\LabStreamLayer\Functions\Predicting-Distraction\Experiment1\\"
+filepath = r"C:\Users\Riley\Desktop\UTK\DataVis\Experiment1\\"
 file_list = glob.glob(filepath + 'exp*.xdf')
 #Combined = pd.DataFrame()
 #Combined = np.empty([13,869,1])
@@ -89,7 +89,7 @@ for i, file in enumerate(file_list):
                 if val == 9999 and Home[idx+1] == 0:
                     HomeIDX.append(idx)
             if len(HomeIDX) == 2:
-                dis1 = HomeIDX[0]
+                dis1 = HomeIDX[0] #set end of no distractions when i teleport them back to start, no longer used on new files
                 dis2 = HomeIDX[1]
             else:
                 print('More than 2 Home Teleports!!!')
@@ -187,10 +187,15 @@ for i, file in enumerate(file_list):
     dis2 = IDX44[-1] #end of 4x4
     dis3begin = IDX55[0]
     dis3 = IDX55[-1] #end of 5x5
-    length.append(dis1)
+    #length.append(dis1)
     length.append(dis2-dis2begin)
     length.append(dis3-dis3begin)
     
+    if dis1 > min([(dis2-dis2begin),(dis3-dis3begin)]): #If dis1 > than than min of distraction length, it will be over-represented in the data distribution
+        dis1 = min([(dis2-dis2begin),(dis3-dis3begin)])+1
+    dis2 = dis2begin + dis1
+    dis3 = dis3begin + dis1
+        
     gsr_phasic = signal.resample(gsr_phasic, len(Accel)).tolist()
     
     x0 = np.linspace(1,dis1,dis1)
