@@ -52,10 +52,12 @@ def trainScore(X,y2,y3,col='all',graphs=True):
         disp2 = ConfusionMatrixDisplay(confusion_matrix=confusion2,display_labels=['Undistracted','Distracted'])
         disp3 = ConfusionMatrixDisplay(confusion_matrix=confusion3,display_labels=['Undistracted','Distracted','Very Distracted'])
         disp2.plot()
+        plt.savefig('2by2Confusion')
         plt.show()
         disp3.plot()
+        plt.savefig('3by3Confusion')
         plt.show()
-
+        
 
 X = np.load('data.npy', allow_pickle=True)
 numSamples = X.shape[0]
@@ -67,7 +69,7 @@ transformer = WEASELMUSE(word_size=5, n_bins=2, window_sizes=[12, 36],
                           chi2_threshold=15, sparse=False, strategy='uniform')
 
 
-trainScore(X,y2,y3,graphs=False)
+trainScore(X,y2,y3,graphs=True)
 
 # Accuracy by Column
 # columns = ["Accel","Brake","Openness","PupilL","PupilR","Speed","Steering","Throttle","Center","Front","Back","Objects_numeric","gsr_phasic","State"]       

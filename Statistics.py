@@ -21,42 +21,56 @@ def graphGen(): #function that generates plots
     # obj = (X3.groupby(x2)[x1].value_counts(normalize=True)
     #         .mul(100).rename('percent').reset_index().pipe((sns.catplot,'data'), 
     #         x=x2,y='percent',hue=x1, kind='bar', order=['Undistracted','Distracted','Very Distracted']))
-    obj = sns.displot(x='Objects_numeric', hue='State', data=X3, stat='percent', common_norm=False)
+    obj = sns.displot(x='Objects_numeric', hue='State', data=X3, stat='percent', common_norm=False,multiple='dodge')
     plt.xlabel('Focal Point')
+    plt.savefig('Objects_numeric.png')
 
     #GSR plot
-    #gsr = sns.displot(x='gsr_phasic', hue='State', data=X3, kind='kde', bw_method=0.2, clip=(0,1))
-    gsr = sns.displot(x='gsr_phasic', col='State', data=X3, stat='percent')
+    gsr = sns.displot(x='gsr_phasic', col='State', data=X3, stat='percent', common_norm=False, binwidth=0.1)
+    gsr.set(xlabel='GSR')
+    plt.savefig('gsr_phasic.png')
 
     #Accel plot
-    #Accel = sns.displot(x='Accel', hue='State', data=X3, kind='kde', bw_method=0.2, clip=(-10,10))
     Accel = sns.displot(x='Accel', col='State', data=X3, kind='hist', stat='percent', common_norm=False, element='step', discrete=False)
     plt.xlim(-5,5)
+    Accel.set(xlabel='Acceleration')
+    plt.savefig('Accel.png')
     
-    # #Speed
-    # Speed = sns.displot(x='Speed', col='State', data=X3, kind='hist', stat='percent', common_norm=False, element='step', discrete=False)
+    #Speed
+    Speed = sns.displot(x='Speed', col='State', data=X3, kind='hist', stat='percent', common_norm=False, element='step', discrete=False)
+    plt.savefig('Speed.png')
 
-    # #Openness
-    # Openness = sns.displot(x='Openness', hue='State', data=X3, kind='ecdf')
-    # plt.ylabel('Proportion in Data')
-    
-    # #Front
-    # Front = sns.displot(x='Front', col='State', data=X3, kind='hist', stat='percent', common_norm=False, element='step', discrete=False)
-    # plt.xlabel('Distance to Car in Front')
-    
-    # #Back
-    # Back = sns.displot(x='Back', col='State', data=X3, kind='hist', stat='percent', common_norm=False, element='step', discrete=False)
-    # # Back = sns.displot(x=X3.Back[pd.notna(X3.Back)], hue=X3.State[pd.notna(X3.Back)], kind='kde')
-    
-    # #Center
-    # Center = sns.displot(x='Center', col='State', data=X3, kind='hist', stat='percent', common_norm=False, element='step', discrete=False)
-    
-    # #Steering
-    # Steering = sns.displot(x='Steering', col='State', data=X3, kind='hist', stat='percent', common_norm=False, element='step', discrete=False)
-    
-    # #PupilL
-    # PupilL = sns.displot(x='PupilL', col='State', data=X3, kind='hist', stat='percent', common_norm=False, element='step', discrete=False)
-    
+    #Openness
+    Openness = sns.displot(x='Openness', hue='State', data=X3, kind='ecdf')
+    Openness.set(xlabel='Eye Openness')
+    plt.ylabel('Proportion in Data')
+    plt.savefig('Openness.png')
+
+    #Front
+    Front = sns.displot(x='Front', col='State', data=X3, kind='hist', stat='percent', common_norm=False, element='step', discrete=False)
+    Front.set(xlabel='Distance to Car in Front')
+    plt.savefig('Front.png')
+
+    #Back
+    Back = sns.displot(x='Back', col='State', data=X3, kind='hist', stat='percent', common_norm=False, element='step', discrete=False)
+    # Back = sns.displot(x=X3.Back[pd.notna(X3.Back)], hue=X3.State[pd.notna(X3.Back)], kind='kde')
+    Back.set(xlabel='Distance to Car Behind')
+    plt.savefig('Back.png')
+
+    #Center
+    Center = sns.displot(x='Center', col='State', data=X3, kind='hist', stat='percent', common_norm=False, element='step', discrete=False)
+    Center.set(xlabel='Distance to Center of Road')
+    plt.savefig('Center.png')
+
+    #Steering
+    Steering = sns.displot(x='Steering', col='State', data=X3, kind='hist', stat='percent', common_norm=False, element='step', discrete=False)
+    Steering.set(xlabel='Steering Activation (-0.5 to 0.5)')
+    plt.savefig('Steering.png')
+
+    #PupilL
+    PupilL = sns.displot(x='PupilL', col='State', data=X3, kind='hist', stat='percent', common_norm=False, element='step', discrete=False)
+    plt.savefig('PupilL.png')
+
     # #Versus
     # Versus = sns.displot(x='Front', y='Speed', hue='State', data=X3)
     # x1,x2 = 'Accel', 'State'
@@ -89,20 +103,33 @@ X3 = X3[X3<9000]
 
 corr2 = X2.corr().abs().unstack().reset_index()
 corr2 = corr2[corr2.level_0=='State']
-corr3 = X3.corr().abs().unstack().reset_index()
+corr3 = X3.corr(method='spearman').abs().unstack().reset_index()
 corr3 = corr3[corr3.level_0=='State']
 
-X3.State = X3.State.map({0:'Undistracted',1:'Distracted',2:'Very Distracted'}) # replace numeric state with categorical
-X3.Objects_numeric = X3.Objects_numeric.map({2.0:'Front',4.0:'Arrows',5.0:'Other', 1000.0:'None'}) # replace numeric state with categorical
-X3.gsr_phasic = pd.qcut(X3.gsr_phasic,10,labels=np.linspace(0,1,10)).astype('float') #bin values
 
+#X3.gsr_phasic = pd.qcut(X3.gsr_phasic,11,labels=np.linspace(0,1,11)).astype('float') #bin values
+
+#graphGen()
 if len(sys.argv) > 1:
     if sys.argv[1] == 'graphs':
+        X3.State = X3.State.map({0:'Undistracted',1:'Distracted',2:'Very Distracted'}) # replace numeric state with categorical
+        X3.Objects_numeric = X3.Objects_numeric.map({2.0:'Front',4.0:'Arrows',5.0:'Other', 1000.0:'None'}) # replace numeric state with categorical
         graphGen()
         
     if sys.argv[1] == 'single':
         file_num = int(input('File number: '))
         X2 = X2.iloc[3*numSteps*(file_num-1):3*numSteps*(file_num)] #select subsample from master list
         X3 = X3.iloc[3*numSteps*(file_num-1):3*numSteps*(file_num)]
+        corr3_single = X3.corr().abs().unstack().reset_index()
+        corr3_single = corr3_single[corr3_single.level_0=='State']
+        X3.State = X3.State.map({0:'Undistracted',1:'Distracted',2:'Very Distracted'}) # replace numeric state with categorical
+        X3.Objects_numeric = X3.Objects_numeric.map({2.0:'Front',4.0:'Arrows',5.0:'Other', 1000.0:'None'}) # replace numeric state with categorical
         graphGen()
-        
+    if sys.argv[1] == 'skipFirst':
+        X2 = X2.iloc[3*numSteps*6:] #select subsample from master list
+        X3 = X3.iloc[3*numSteps*6:] #select subsample from master list
+        # corr3_skip = X3.corr(method='spearman').abs().unstack().reset_index()
+        # corr3_skip = corr3_skip[corr3_skip.level_0=='State']
+        # X3.State = X3.State.map({0:'Undistracted',1:'Distracted',2:'Very Distracted'}) # replace numeric state with categorical
+        # X3.Objects_numeric = X3.Objects_numeric.map({2.0:'Front',4.0:'Arrows',5.0:'Other', 1000.0:'None'}) # replace numeric state with categorical
+        # graphGen()
