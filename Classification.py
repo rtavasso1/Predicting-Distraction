@@ -19,8 +19,9 @@ import seaborn as sns
 
 def trainScore(X,y2,y3,col='all',graphs=True):
     skf = StratifiedKFold(n_splits=5,shuffle=True) #maintains class balance in folds for 2 class case
-    if col=='all':
-        transformer = WEASELMUSE(word_size=5, n_bins=2, window_sizes=[12, 36], chi2_threshold=15, sparse=False, strategy='uniform')
+    if col=='all' or 'and' in col:
+        print('hi')
+        transformer = WEASELMUSE(word_size=5, n_bins=2, window_sizes=[12,36], chi2_threshold=5, sparse=False, strategy='uniform')
     else:
         transformer = WEASEL(sparse=False)
         
@@ -65,7 +66,7 @@ def trainScore(X,y2,y3,col='all',graphs=True):
         disp3 = ConfusionMatrixDisplay(confusion_matrix=confusion3,display_labels=['Undistracted','Distracted','Very Distracted'])
         disp2.plot()
         plt.title(col)
-        plt.savefig('2by2Confusion'+col)
+        plt.savefig('HistPlots/2by2Confusion'+col)
         plt.show()
         disp3.plot()
         plt.title(col)
@@ -73,31 +74,49 @@ def trainScore(X,y2,y3,col='all',graphs=True):
         plt.show()
     return np.average(scores2), np.average(scores3)
 
+def singleCol(graphs=True):
+    scores2,scores3 = [], []
+    for i, col in enumerate(columns):
+        score2, score3 = trainScore(X[:,i,:],y2,y3,col=col,graphs=False)
+        scores2.append(score2)
+        scores3.append(score3)
+    if graphs==True:
+        ax = sns.barplot(x=columns,y=scores2, order=scores2.sort())
+        ax.set_xticklabels(ax.get_xticklabels(), rotation=40, ha="right")
+        ax.set_ylabel('Accuracy')
+        plt.savefig('SingleFeature/2 Class Feature Importance')
+        plt.show()
+        ax = sns.barplot(x=columns,y=scores3, order=scores3.sort())
+        ax.set_xticklabels(ax.get_xticklabels(), rotation=40, ha="right")
+        ax.set_ylabel('Accuracy')
+        plt.savefig('SingleFeature/3 Class Feature Importance')
+        plt.show()
+    return scores2, scores3
+
+def pairCols():
+    scores2,scores3 = {},{}
+    for i, col1 in enumerate(columns):
+        for j, col2 in enumerate(columns):
+            if i<=j:
+                continue
+            cols = col1 + ' and ' + col2
+            X_pair = np.concatenate((X[:,i,:].reshape(numSamples,1,-1),X[:,j,:].reshape(numSamples,1,-1)),axis=1)
+            score2, score3 = trainScore(X_pair,y2,y3,col=cols,graphs=False)
+            scores2[cols] = score2
+            scores3[cols] = score3
+    return scores2, scores3
+
 X = np.load('data.npy', allow_pickle=True)
 numSamples = X.shape[0]
 y2, y3 = [0,1,1]*(numSamples//3), [0,1,2]*(numSamples//3)
 y2, y3 = np.array(y2), np.array(y3)
-
-# trainScore(X,y2,y3,graphs=False)
 columns = ['Accel','Brake','Openness','PupilL','PupilR','Speed','Steering','Throttle','Center','Front','Back','Objects_numeric','gsr_phasic']
-scores2,scores3 = [], []
-for i, col in enumerate(columns):
-    score2, score3 = trainScore(X[:,i,:],y2,y3,col=col,graphs=False)
-    scores2.append(score2)
-    scores3.append(score3)
 
-# plt.hist(scores2)
-# plt.hist(scores3)
-ax = sns.barplot(x=columns,y=scores2, order=scores2.sort())
-ax.set_xticklabels(ax.get_xticklabels(), rotation=40, ha="right")
-ax.set_ylabel('Accuracy')
-plt.savefig('2 Class Feature Importance')
-plt.show()
-ax = sns.barplot(x=columns,y=scores3, order=scores3.sort())
-ax.set_xticklabels(ax.get_xticklabels(), rotation=40, ha="right")
-ax.set_ylabel('Accuracy')
-plt.savefig('3 Class Feature Importance')
-plt.show()
+# scores2, scores3 = trainScore(X,y2,y3,graphs=False)
+# scores2, scores3 = singleCol(graphs=False)
+scores2, scores3 = pairCols()
+
+
 
 # jrp = JointRecurrencePlot(threshold='point', percentage=50)
 # X_jrp = jrp.fit_transform(X)
