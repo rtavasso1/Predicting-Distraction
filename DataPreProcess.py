@@ -70,11 +70,11 @@ def sublister(x):
     return temp
 
 
-filepath = r"C:\Users\Riley\Desktop\UTK\DataVis\Experiment1\\"
+#filepath = r"D:\Users\admin\Documents\BitBrain\LabStreamLayer\XDF_Files\Experiment1\6688\\"
+#filepath = r"D:\Users\admin\Documents\BitBrain\LabStreamLayer\XDF_Files\Experiment1\Test\\"
+filepath = r"D:\Users\admin\Documents\BitBrain\LabStreamLayer\Functions\Predicting-Distraction\Experiment1\6688\\"
 file_list = glob.glob(filepath + 'exp*.xdf')
-#Combined = pd.DataFrame()
-#Combined = np.empty([13,869,1])
-#Combined = np
+
 length = []
 maxlen = 475 #update when adding new files by taking max(length)
 for i, file in enumerate(file_list):
@@ -160,6 +160,7 @@ for i, file in enumerate(file_list):
             Front = np.expand_dims(y[:,0], axis=1)[:,0].tolist()
             Back = np.expand_dims(y[:,1], axis=1)[:,0].tolist()
             Center = np.expand_dims(y[:,2], axis=1)[:,0].tolist()
+            #DerivFront = np.expand_dims(y[:,3], axis=1)[:,0].tolist()
             #Front = Back = Center = [5.0 for i in range(len(y))]
             #print('Distance to cars and center initialized')
         
@@ -196,7 +197,7 @@ for i, file in enumerate(file_list):
     dis2 = dis2begin + dis1
     dis3 = dis3begin + dis1
         
-    gsr_phasic = signal.resample(gsr_phasic, len(Accel)).tolist()
+    #gsr_phasic = signal.resample(gsr_phasic, len(Accel)).tolist()
     
     x0 = np.linspace(1,dis1,dis1)
     x1 = np.linspace(1,dis2-dis2begin,dis2-dis2begin)
@@ -222,5 +223,7 @@ for i, file in enumerate(file_list):
     except:
         Combined = np.concatenate((mylist0,mylist1,mylist2),axis=0)
 
-os.remove('data.npy')
-np.save('data.npy', Combined, allow_pickle=True)
+os.remove('data6688.npy')
+np.save('data6688.npy', Combined, allow_pickle=True)
+
+
