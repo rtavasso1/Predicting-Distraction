@@ -121,7 +121,7 @@ def loadData(bigDis=True):
     
     return X2_2d, X3_2d
 
-X2_2d, X3_2d = loadData(bigDis=False)
+X2_2d, X3_2d = loadData(bigDis=True)
 
 columns = ["Accel","Brake","Openness","PupilL","PupilR","Speed","Steering","Throttle","Center","Front","Back","Objects_numeric","gsr_phasic","State"]
 X2 = pd.DataFrame(X2_2d, columns=columns)
