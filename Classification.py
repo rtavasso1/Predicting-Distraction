@@ -20,7 +20,6 @@ import seaborn as sns
 def trainScore(X,y2,y3,col='all',graphs=True):
     skf = StratifiedKFold(n_splits=5,shuffle=True) #maintains class balance in folds for 2 class case
     if col=='all' or 'and' in col:
-        print('hi')
         transformer = WEASELMUSE(word_size=5, n_bins=2, window_sizes=[12,36], chi2_threshold=5, sparse=False, strategy='uniform')
     else:
         transformer = WEASEL(sparse=False)
@@ -117,14 +116,6 @@ columns = ['Accel','Brake','Openness','PupilL','PupilR','Speed','Steering','Thro
 scores2, scores3 = pairCols()
 
 
-
-# jrp = JointRecurrencePlot(threshold='point', percentage=50)
-# X_jrp = jrp.fit_transform(X)
-# plt.figure(figsize=(5, 5))
-# plt.imshow(X_jrp[3], cmap='binary', origin='lower')
-# plt.title('Joint Recurrence Plot', fontsize=18)
-# plt.tight_layout()
-# plt.show()
 
 
 

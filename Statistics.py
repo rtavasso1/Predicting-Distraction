@@ -98,6 +98,7 @@ X2 = pd.DataFrame(X2_2d, columns=columns)
 X3 = pd.DataFrame(X3_2d, columns=columns)
 X2 = X2[X2<9000] #filters padded data (values=9999)
 X3 = X3[X3<9000]
+#X3.to_csv('data.csv')
 # X2 = X2.dropna(axis=0,thresh=13) #drops the rows that are all padding
 # X3 = X3.dropna(axis=0,thresh=13)
 
